@@ -20,7 +20,7 @@ public class EquipeView extends JPanel {
     public EquipeView() {
         setLayout(new BorderLayout());
 
-        // Painel de botões
+        // ---- Painel de botões ----
         JPanel panelBotoes = new JPanel(new FlowLayout(FlowLayout.LEFT));
         btnNovo = new JButton("Novo");
         btnEditar = new JButton("Editar");
@@ -32,14 +32,14 @@ public class EquipeView extends JPanel {
 
         add(panelBotoes, BorderLayout.NORTH);
 
-        // Tabela
+        // ---- Tabela ----
         tableModel = new DefaultTableModel(new Object[]{"ID", "Nome", "Descrição"}, 0);
         table = new JTable(tableModel);
         add(new JScrollPane(table), BorderLayout.CENTER);
 
         carregarTabela();
 
-        // Eventos
+        // ---- Eventos ----
         btnNovo.addActionListener(e -> abrirFormulario(null));
 
         btnEditar.addActionListener(e -> {

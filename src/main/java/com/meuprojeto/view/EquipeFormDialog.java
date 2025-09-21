@@ -16,36 +16,56 @@ public class EquipeFormDialog extends JDialog {
         super(parent, true);
         this.equipe = e != null ? e : new Equipe();
         setTitle(e != null ? "Editar Equipe" : "Nova Equipe");
-        setSize(400, 300);
+        setSize(400, 350);
         setLocationRelativeTo(parent);
         setLayout(new GridBagLayout());
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5,5,5,5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        // Campos
-        txtNome = new JTextField(this.equipe.getNome(), 20);
-        txtDescricao = new JTextArea(this.equipe.getDescricao(), 3, 20);
+        gbc.gridx = 0;
+        gbc.weightx = 1.0;
 
         int y = 0;
-        gbc.gridx = 0; gbc.gridy = y; add(new JLabel("Nome:"), gbc);
-        gbc.gridx = 1; add(txtNome, gbc);
 
-        gbc.gridx = 0; gbc.gridy = ++y; add(new JLabel("Descrição:"), gbc);
-        gbc.gridx = 1; add(new JScrollPane(txtDescricao), gbc);
+        // ---- NOME ----
+        gbc.gridy = y++;
+        add(new JLabel("Nome*:"), gbc);
 
-        // Botões
-        gbc.gridx = 0; gbc.gridy = ++y;
+        gbc.gridy = y++;
+        txtNome = new JTextField(this.equipe.getNome(), 20);
+        add(txtNome, gbc);
+
+        // ---- DESCRIÇÃO ----
+        gbc.gridy = y++;
+        add(new JLabel("Descrição:"), gbc);
+
+        gbc.gridy = y++;
+        txtDescricao = new JTextArea(this.equipe.getDescricao(), 3, 20);
+        add(new JScrollPane(txtDescricao), gbc);
+
+        // ---- BOTÕES ----
+        JPanel panelButtons = new JPanel();
         btnSalvar = new JButton("Salvar");
-        add(btnSalvar, gbc);
-        gbc.gridx = 1;
         btnCancelar = new JButton("Cancelar");
-        add(btnCancelar, gbc);
+        panelButtons.add(btnSalvar);
+        panelButtons.add(btnCancelar);
 
-        // Ações
+        gbc.gridy = y++;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(panelButtons, gbc);
+
+        // ---- AÇÕES ----
         btnSalvar.addActionListener(ae -> {
-            equipe.setNome(txtNome.getText());
-            equipe.setDescricao(txtDescricao.getText());
+            // Validação obrigatória do nome
+            if (txtNome.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "O nome da equipe é obrigatório!");
+                return;
+            }
+
+            equipe.setNome(txtNome.getText().trim());
+            equipe.setDescricao(txtDescricao.getText().trim());
             salvo = true;
             dispose();
         });

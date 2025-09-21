@@ -16,9 +16,13 @@ public class Projeto {
     // Inicializa a lista para nunca ser null
     private List<Equipe> equipes = new ArrayList<>();
 
+    // Novo campo para identificar se o projeto está ativo
+    private boolean ativo = true;
+
     public Projeto() {}
 
-    public Projeto(int id, String nome, String descricao, Date dataInicio, Date dataTerminoPrevista, String status, Usuario gerente, List<Equipe> equipes) {
+    public Projeto(int id, String nome, String descricao, Date dataInicio, Date dataTerminoPrevista,
+                   String status, Usuario gerente, List<Equipe> equipes, boolean ativo) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
@@ -26,8 +30,8 @@ public class Projeto {
         this.dataTerminoPrevista = dataTerminoPrevista;
         this.status = status;
         this.gerente = gerente;
-        // Garante que a lista nunca seja null
         this.equipes = equipes != null ? equipes : new ArrayList<>();
+        this.ativo = ativo;
     }
 
     public int getId() { return id; }
@@ -52,9 +56,15 @@ public class Projeto {
     public void setGerente(Usuario gerente) { this.gerente = gerente; }
 
     public List<Equipe> getEquipes() { return equipes; }
-
     public void setEquipes(List<Equipe> equipes) {
-        // Garante que a lista nunca seja null
         this.equipes = equipes != null ? equipes : new ArrayList<>();
+    }
+
+    public boolean isAtivo() { return ativo; }
+    public void setAtivo(boolean ativo) { this.ativo = ativo; }
+
+    @Override
+    public String toString() {
+        return this.nome; // garante que no JComboBox mostre apenas o nome
     }
 }

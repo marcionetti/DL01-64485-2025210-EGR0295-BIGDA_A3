@@ -52,7 +52,7 @@ public class LoginView extends JFrame {
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         JLabel lblInfo = new JLabel(
-                "<html>Usuários de teste: <b>admin</b>, <b>gerente</b>, <b>colaborador</b><br>Senha para todos: <b>12345</b></html>");
+                "<html>Usuários de teste: <b>admin</b>, <b>gerente</b>, <b>colaborador</b><br>Senha para todos: <b>#Teste2025</b></html>");
         lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
         add(lblInfo, gbc);
 
@@ -67,7 +67,7 @@ public class LoginView extends JFrame {
         Usuario usuario = usuarioController.autenticarUsuario(loginOuEmail, senha);
         if (usuario != null) {
             this.dispose();
-            new DashboardView(usuario.getNome(), usuario.getPerfil()).setVisible(true);
+            new PainelDashboard(usuario.getNome(), usuario.getPerfil()).setVisible(true);
         } else {
             JOptionPane.showMessageDialog(this, "Login ou senha incorretos!", "Erro", JOptionPane.ERROR_MESSAGE);
             txtSenha.setText("");

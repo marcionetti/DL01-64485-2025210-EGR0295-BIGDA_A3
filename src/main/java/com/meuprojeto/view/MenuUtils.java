@@ -7,9 +7,10 @@ public class MenuUtils {
 
     private static JButton btnAtivo = null; // botão ativo
 
-    public static JMenuBar criarMenu(String perfilUsuario, DashboardView dash) {
+    public static JMenuBar criarMenu(String perfilUsuario, PainelDashboard painelDashboard) {
         JMenuBar menuBar = new JMenuBar();
 
+        JButton btnDashboard = new JButton("Dashboard");
         JButton btnUsuarios = new JButton("Usuários");
         JButton btnProjetos = new JButton("Projetos");
         JButton btnEquipes = new JButton("Equipes");
@@ -19,17 +20,20 @@ public class MenuUtils {
         // Adiciona conforme perfil
         switch (perfilUsuario) {
             case "ADMIN":
+                menuBar.add(btnDashboard);
                 menuBar.add(btnUsuarios);
                 menuBar.add(btnProjetos);
                 menuBar.add(btnEquipes);
                 menuBar.add(btnTarefas);
                 break;
             case "GERENTE":
+                menuBar.add(btnDashboard);
                 menuBar.add(btnProjetos);
                 menuBar.add(btnEquipes);
                 menuBar.add(btnTarefas);
                 break;
             case "COLABORADOR":
+                menuBar.add(btnDashboard);
                 menuBar.add(btnTarefas);
                 break;
         }
@@ -39,27 +43,32 @@ public class MenuUtils {
 
         // Listeners
         btnUsuarios.addActionListener(e -> {
-            dash.mostrarTela(new UsuarioView());
+            painelDashboard.mostrarTela(new UsuarioView());
             setBotaoAtivo(btnUsuarios);
         });
 
         btnProjetos.addActionListener(e -> {
-            dash.mostrarTela(new ProjetoView());
+            painelDashboard.mostrarTela(new ProjetoView());
             setBotaoAtivo(btnProjetos);
         });
 
         btnEquipes.addActionListener(e -> {
-            dash.mostrarTela(new EquipeView());
+            painelDashboard.mostrarTela(new EquipeView());
             setBotaoAtivo(btnEquipes);
         });
 
         btnTarefas.addActionListener(e -> {
-            dash.mostrarTela(new TarefaView());
+            painelDashboard.mostrarTela(new TarefaView());
             setBotaoAtivo(btnTarefas);
         });
 
+        btnDashboard.addActionListener(e -> {
+            painelDashboard.mostrarTela(new DashboardView());
+            setBotaoAtivo(btnDashboard);
+        });
+
         btnLogout.addActionListener(e -> {
-            dash.dispose();
+            painelDashboard.dispose();
             new LoginView().setVisible(true);
         });
 

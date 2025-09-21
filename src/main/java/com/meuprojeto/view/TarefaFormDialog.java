@@ -2,14 +2,13 @@ package com.meuprojeto.view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.meuprojeto.controller.ProjetoController;
 import com.meuprojeto.controller.UsuarioController;
 import com.meuprojeto.model.Tarefa;
 import com.meuprojeto.model.Projeto;
 import com.meuprojeto.model.Usuario;
+
+import com.toedter.calendar.JDateChooser;
 
 public class TarefaFormDialog extends JDialog {
 
@@ -18,10 +17,10 @@ public class TarefaFormDialog extends JDialog {
     private JComboBox<Projeto> cbProjeto;
     private JComboBox<Usuario> cbResponsavel;
     private JComboBox<String> cbStatus;
-    private JTextField txtDataInicioPrevista;
-    private JTextField txtDataFimPrevista;
-    private JTextField txtDataInicioReal;
-    private JTextField txtDataFimReal;
+    private JDateChooser txtDataInicioPrevista;
+    private JDateChooser txtDataFimPrevista;
+    private JDateChooser txtDataInicioReal;
+    private JDateChooser txtDataFimReal;
 
     private JButton btnSalvar, btnCancelar;
 
@@ -31,82 +30,136 @@ public class TarefaFormDialog extends JDialog {
     private ProjetoController projetoController = new ProjetoController();
     private UsuarioController usuarioController = new UsuarioController();
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
     public TarefaFormDialog(JFrame parent, Tarefa t) {
         super(parent, true);
         this.tarefa = t != null ? t : new Tarefa();
         setTitle(t != null ? "Editar Tarefa" : "Nova Tarefa");
-        setSize(450, 500);
+        setSize(450, 550);
         setLocationRelativeTo(parent);
         setLayout(new GridBagLayout());
+
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5,5,5,5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.weightx = 1.0;
 
         int y = 0;
 
-        // Campos
+        // ---- TÍTULO ----
+        gbc.gridy = y++;
+        add(new JLabel("Título*:"), gbc);
+
+        gbc.gridy = y++;
         txtTitulo = new JTextField(this.tarefa.getTitulo(), 25);
-        gbc.gridx = 0; gbc.gridy = y; add(new JLabel("Título:"), gbc);
-        gbc.gridx = 1; add(txtTitulo, gbc);
+        add(txtTitulo, gbc);
 
+        // ---- DESCRIÇÃO ----
+        gbc.gridy = y++;
+        add(new JLabel("Descrição:"), gbc);
+
+        gbc.gridy = y++;
         txtDescricao = new JTextArea(this.tarefa.getDescricao(), 3, 25);
-        gbc.gridx = 0; gbc.gridy = ++y; add(new JLabel("Descrição:"), gbc);
-        gbc.gridx = 1; add(new JScrollPane(txtDescricao), gbc);
+        txtDescricao.setLineWrap(true);
+        txtDescricao.setWrapStyleWord(true);
+        add(new JScrollPane(txtDescricao), gbc);
 
+        // ---- PROJETO ----
+        gbc.gridy = y++;
+        add(new JLabel("Projeto*:"), gbc);
+
+        gbc.gridy = y++;
         cbProjeto = new JComboBox<>();
         carregarProjetos();
         if (this.tarefa.getProjeto() != null) cbProjeto.setSelectedItem(this.tarefa.getProjeto());
-        gbc.gridx = 0; gbc.gridy = ++y; add(new JLabel("Projeto:"), gbc);
-        gbc.gridx = 1; add(cbProjeto, gbc);
+        add(cbProjeto, gbc);
 
+        // ---- RESPONSÁVEL ----
+        gbc.gridy = y++;
+        add(new JLabel("Responsável:"), gbc);
+
+        gbc.gridy = y++;
         cbResponsavel = new JComboBox<>();
         carregarResponsaveis();
         if (this.tarefa.getResponsavel() != null) cbResponsavel.setSelectedItem(this.tarefa.getResponsavel());
-        gbc.gridx = 0; gbc.gridy = ++y; add(new JLabel("Responsável:"), gbc);
-        gbc.gridx = 1; add(cbResponsavel, gbc);
+        add(cbResponsavel, gbc);
 
-        cbStatus = new JComboBox<>(new String[]{"Aberta", "Em andamento", "Concluída", "Cancelada"});
+        // ---- STATUS ----
+        gbc.gridy = y++;
+        add(new JLabel("Status:"), gbc);
+
+        gbc.gridy = y++;
+        cbStatus = new JComboBox<>(new String[]{"PENDENTE", "EM_EXECUCAO", "CONCLUIDA"});
         if (this.tarefa.getStatus() != null) cbStatus.setSelectedItem(this.tarefa.getStatus());
-        gbc.gridx = 0; gbc.gridy = ++y; add(new JLabel("Status:"), gbc);
-        gbc.gridx = 1; add(cbStatus, gbc);
+        add(cbStatus, gbc);
 
-        txtDataInicioPrevista = new JTextField(formatDate(this.tarefa.getDataInicioPrevista()), 10);
-        gbc.gridx = 0; gbc.gridy = ++y; add(new JLabel("Data Início Prevista (YYYY-MM-DD):"), gbc);
-        gbc.gridx = 1; add(txtDataInicioPrevista, gbc);
+        // ---- DATAS PREVISTAS ----
+        gbc.gridy = y++;
+        add(new JLabel("Datas Previstas:"), gbc);
 
-        txtDataFimPrevista = new JTextField(formatDate(this.tarefa.getDataFimPrevista()), 10);
-        gbc.gridx = 0; gbc.gridy = ++y; add(new JLabel("Data Fim Prevista (YYYY-MM-DD):"), gbc);
-        gbc.gridx = 1; add(txtDataFimPrevista, gbc);
+        JPanel panelPrevistas = new JPanel(new GridLayout(1, 2, 10, 0));
+        txtDataInicioPrevista = new JDateChooser();
+        txtDataInicioPrevista.setDate(this.tarefa.getDataInicioPrevista());
+        txtDataFimPrevista = new JDateChooser();
+        txtDataFimPrevista.setDate(this.tarefa.getDataFimPrevista());
+        panelPrevistas.add(txtDataInicioPrevista);
+        panelPrevistas.add(txtDataFimPrevista);
 
-        txtDataInicioReal = new JTextField(formatDate(this.tarefa.getDataInicioReal()), 10);
-        gbc.gridx = 0; gbc.gridy = ++y; add(new JLabel("Data Início Real (YYYY-MM-DD):"), gbc);
-        gbc.gridx = 1; add(txtDataInicioReal, gbc);
+        gbc.gridy = y++;
+        add(panelPrevistas, gbc);
 
-        txtDataFimReal = new JTextField(formatDate(this.tarefa.getDataFimReal()), 10);
-        gbc.gridx = 0; gbc.gridy = ++y; add(new JLabel("Data Fim Real (YYYY-MM-DD):"), gbc);
-        gbc.gridx = 1; add(txtDataFimReal, gbc);
+        // ---- DATAS REAIS ----
+        gbc.gridy = y++;
+        add(new JLabel("Datas Reais:"), gbc);
 
-        // Botões
-        gbc.gridx = 0; gbc.gridy = ++y;
+        JPanel panelReais = new JPanel(new GridLayout(1, 2, 10, 0));
+        txtDataInicioReal = new JDateChooser();
+        txtDataInicioReal.setDate(this.tarefa.getDataInicioReal());
+        txtDataFimReal = new JDateChooser();
+        txtDataFimReal.setDate(this.tarefa.getDataFimReal());
+        panelReais.add(txtDataInicioReal);
+        panelReais.add(txtDataFimReal);
+
+        gbc.gridy = y++;
+        add(panelReais, gbc);
+
+        // ---- BOTÕES ----
+        JPanel panelButtons = new JPanel();
         btnSalvar = new JButton("Salvar");
-        add(btnSalvar, gbc);
-        gbc.gridx = 1;
         btnCancelar = new JButton("Cancelar");
-        add(btnCancelar, gbc);
+        panelButtons.add(btnSalvar);
+        panelButtons.add(btnCancelar);
 
-        // Ações
+        gbc.gridy = y++;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(panelButtons, gbc);
+
+        // ---- AÇÕES ----
         btnSalvar.addActionListener(e -> {
+            // Validação obrigatória
+            if (txtTitulo.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Título é obrigatório!");
+                txtTitulo.requestFocus();
+                return;
+            }
+            if (cbProjeto.getSelectedItem() == null) {
+                JOptionPane.showMessageDialog(this, "Projeto é obrigatório!");
+                cbProjeto.requestFocus();
+                return;
+            }
+
+            // Atualiza tarefa
             tarefa.setTitulo(txtTitulo.getText());
             tarefa.setDescricao(txtDescricao.getText());
             tarefa.setProjeto((Projeto) cbProjeto.getSelectedItem());
             tarefa.setResponsavel((Usuario) cbResponsavel.getSelectedItem());
             tarefa.setStatus((String) cbStatus.getSelectedItem());
-            tarefa.setDataInicioPrevista(parseDate(txtDataInicioPrevista.getText()));
-            tarefa.setDataFimPrevista(parseDate(txtDataFimPrevista.getText()));
-            tarefa.setDataInicioReal(parseDate(txtDataInicioReal.getText()));
-            tarefa.setDataFimReal(parseDate(txtDataFimReal.getText()));
+            tarefa.setDataInicioPrevista(txtDataInicioPrevista.getDate());
+            tarefa.setDataFimPrevista(txtDataFimPrevista.getDate());
+            tarefa.setDataInicioReal(txtDataInicioReal.getDate());
+            tarefa.setDataFimReal(txtDataFimReal.getDate());
+            
             salvo = true;
             dispose();
         });
@@ -116,7 +169,9 @@ public class TarefaFormDialog extends JDialog {
 
     private void carregarProjetos() {
         DefaultComboBoxModel<Projeto> model = new DefaultComboBoxModel<>();
-        for (Projeto p : projetoController.listarProjetos()) model.addElement(p);
+        for (Projeto p : projetoController.listarProjetos()) {
+            if (p.isAtivo()) model.addElement(p);
+        }
         cbProjeto.setModel(model);
     }
 
@@ -124,18 +179,6 @@ public class TarefaFormDialog extends JDialog {
         DefaultComboBoxModel<Usuario> model = new DefaultComboBoxModel<>();
         for (Usuario u : usuarioController.listarUsuarios()) model.addElement(u);
         cbResponsavel.setModel(model);
-    }
-
-    private Date parseDate(String dataStr) {
-        try {
-            return dataStr == null || dataStr.isEmpty() ? null : dateFormat.parse(dataStr);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private String formatDate(Date date) {
-        return date != null ? dateFormat.format(date) : "";
     }
 
     public boolean isSalvo() {
