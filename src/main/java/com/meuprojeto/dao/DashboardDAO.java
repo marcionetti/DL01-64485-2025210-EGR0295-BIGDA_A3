@@ -2,7 +2,6 @@ package com.meuprojeto.dao;
 
 import com.meuprojeto.model.Projeto;
 import com.meuprojeto.model.Usuario;
-import com.meuprojeto.model.Tarefa;
 import com.meuprojeto.util.DBConnection;
 
 import java.sql.*;
@@ -14,7 +13,6 @@ import java.util.Map;
 
 public class DashboardDAO {
 
-    // 1️⃣ Resumo de andamento dos projetos
     public List<Map<String, Object>> getResumoProjetos() throws SQLException {
         String sql = "SELECT p.id, p.nome, COUNT(t.id) AS total_tarefas, " +
                      "SUM(CASE WHEN t.status = 'CONCLUIDA' THEN 1 ELSE 0 END) AS tarefas_concluidas " +
@@ -29,17 +27,19 @@ public class DashboardDAO {
 
             while (rs.next()) {
                 Map<String, Object> m = new HashMap<>();
-                m.put("projetoId", rs.getInt("id"));
-                m.put("nomeProjeto", rs.getString("nome"));
-                m.put("totalTarefas", rs.getInt("total_tarefas"));
-                m.put("tarefasConcluidas", rs.getInt("tarefas_concluidas"));
+                m.put("projetoNome", rs.getString("nome"));
+                int total = rs.getInt("total_tarefas");
+                int concluidas = rs.getInt("tarefas_concluidas");
+                m.put("tarefasTotal", total);
+                m.put("tarefasConcluidas", concluidas);
+                double andamento = total > 0 ? (concluidas * 100.0 / total) : 0;
+                m.put("andamentoPercentual", andamento);
                 resultados.add(m);
             }
         }
         return resultados;
     }
 
-    // 2️⃣ Desempenho de cada colaborador
     public List<Map<String, Object>> getDesempenhoColaboradores() throws SQLException {
         String sql = "SELECT u.id, u.nome, COUNT(t.id) AS total_tarefas, " +
                      "SUM(CASE WHEN t.status = 'CONCLUIDA' THEN 1 ELSE 0 END) AS tarefas_concluidas " +
@@ -54,17 +54,20 @@ public class DashboardDAO {
 
             while (rs.next()) {
                 Map<String, Object> m = new HashMap<>();
-                m.put("usuarioId", rs.getInt("id"));
-                m.put("nomeUsuario", rs.getString("nome"));
-                m.put("totalTarefas", rs.getInt("total_tarefas"));
-                m.put("tarefasConcluidas", rs.getInt("tarefas_concluidas"));
+                m.put("usuarioNome", rs.getString("nome"));
+                int atribu = rs.getInt("total_tarefas");
+                int concluidas = rs.getInt("tarefas_concluidas");
+                m.put("tarefasAtribuidas", atribu);
+                m.put("tarefasConcluidas", concluidas);
+                double produtividade = atribu > 0 ? (concluidas * 100.0 / atribu) : 0;
+                m.put("produtividadePercentual", produtividade);
                 resultados.add(m);
             }
         }
         return resultados;
     }
 
-    // 3️⃣ Projetos em risco de atraso
+
     public List<Projeto> getProjetosEmRisco() throws SQLException {
         String sql = "SELECT * FROM cadProjeto " +
                      "WHERE dataTerminoPrevista < ? AND status != 'CONCLUIDA'";
@@ -84,8 +87,16 @@ public class DashboardDAO {
                 p.setDataInicio(rs.getDate("dataInicio"));
                 p.setDataTerminoPrevista(rs.getDate("dataTerminoPrevista"));
                 p.setStatus(rs.getString("status"));
-                // Se tiver gerente_id na tabela
-                // p.setGerente(new Usuario(rs.getInt("gerente_id"), ... ));
+
+
+                int gerenteId = rs.getInt("gerente_id");
+                if (!rs.wasNull()) {
+                    Usuario gerente = new Usuario();
+                    gerente.setId(gerenteId);
+
+                    p.setGerente(gerente);
+                }
+
                 projetos.add(p);
             }
         }

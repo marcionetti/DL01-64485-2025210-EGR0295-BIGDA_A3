@@ -11,7 +11,6 @@ public class DashboardController {
 
     private DashboardDAO dashboardDAO = new DashboardDAO();
 
-    // 1️⃣ Resumo de andamento dos projetos
     public List<Map<String, Object>> obterResumoProjetos() {
         try {
             return dashboardDAO.getResumoProjetos();
@@ -21,7 +20,6 @@ public class DashboardController {
         }
     }
 
-    // 2️⃣ Desempenho de cada colaborador
     public List<Map<String, Object>> obterDesempenhoColaboradores() {
         try {
             return dashboardDAO.getDesempenhoColaboradores();
@@ -31,7 +29,6 @@ public class DashboardController {
         }
     }
 
-    // 3️⃣ Projetos em risco de atraso
     public List<Projeto> obterProjetosEmRisco() {
         try {
             return dashboardDAO.getProjetosEmRisco();
